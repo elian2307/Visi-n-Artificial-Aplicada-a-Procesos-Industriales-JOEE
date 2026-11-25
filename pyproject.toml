@@ -1,0 +1,9 @@
+[project]
+name = "conteo-bovino"
+version = "0.1.0"
+requires-python = ">=3.15,<3.16"
+dependencies = [
+    "mediapipe==1.2.3",
+    "numpy==2.5.5",
+    "opencv-contrib-python==5.1.0.95",
+]
