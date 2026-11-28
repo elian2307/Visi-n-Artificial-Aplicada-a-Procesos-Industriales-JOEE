@@ -1,10 +1,34 @@
-/.venv/
-/Lib/
-/Scripts/
-/share/
-/pyvenv.cfg
-/.lock
-/CACHEDIR.TAG
-__pycache__/
-*.py[cod]
-.env
+# Archivos compartidos del proyecto. El resto de la raíz queda fuera.
+/*
+!/.gitignore
+!/AGENTS.md
+!/README.md
+!/requirements.txt
+!/pyproject.toml
+!/uv.lock
+
+# Código de ejecución y scripts de preparación y demostración.
+!/conteo_bovino/
+/conteo_bovino/*
+!/conteo_bovino/*.py
+!/scripts/
+/scripts/*
+!/scripts/create_demo.py
+!/scripts/download_hand_model.py
+!/scripts/show_demo.py
+!/scripts/download_pose_models.py
+
+# Configuraciones reproducibles. Las calibraciones locales quedan fuera.
+!/config/
+/config/*
+!/config/example.json
+!/config/farmquip-pose.json
+!/config/internet-toros7.json
+
+# Documentación y referencias manuales de validación.
+!/docs/
+/docs/*
+!/docs/*.md
+!/docs/referencias/
+/docs/referencias/*
+!/docs/referencias/*.csv

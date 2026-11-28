@@ -1,6 +1,6 @@
 # Conteo de bovinos en la manga de manejo
 
-El objetivo es desarrollar un prototipo de visión artificial que cuente los bovinos al pasar de uno en uno por la manga de manejo (*chutis*) y registre cuántos son adultos y cuántos son becerros. El sistema busca asistir al personal del corral en una tarea repetitiva de la industria ganadera regional.
+El objetivo es desarrollar un prototipo de visión artificial que cuente los bovinos al pasar de uno en uno por la manga de manejo (*chutis*) y registre cuántos son adultos y cuántos son becerros. El sistema busca asistir al personal del corral en una tarea repetitiva de la industria ganadera regional...
 
 ## Alcance del prototipo
 
@@ -15,7 +15,13 @@ Una cámara fija observará de lado un tramo recto a la salida del embudo. Cada 
 
 ## Estado y entorno
 
-El proyecto está en fase de diseño. El entorno local de Windows se creó con `uv` en la raíz del repositorio y ya se verificó la importación de OpenCV y MediaPipe. El conteo, la clasificación y la revisión por gestos están pendientes de implementación y validación con video del corral.
+El prototipo ya incluye captura de video o cámara, detección de movimiento con OpenCV, seguimiento, conteo A → B, clasificación por altura calibrada y revisión por teclado o MediaPipe Hands. Guarda eventos y correcciones en CSV y JSON, y opcionalmente video anotado. Las pruebas de reglas y video sintético se describen en el [informe de implementación](docs/implementacion.md). Sigue pendiente validar su precisión con bovinos reales y la cámara del corral.
+
+También se ejecutó una [prueba con video público de bovinos](docs/pruebas-internet-2026-11-27.md): dos cruces correctos en un tramo preparado y fallos en la toma completa con fondo inicial ocupado. Hay 17 pruebas automatizadas aprobadas. Estos resultados no equivalen a una precisión general validada.
+
+Actualización: ya está disponible el [modo de detección individual con cabeza y lomo](docs/pose-animal.md), mediante `--detector pose`. Usa YOLOX-s y RTMPose AP-10K con OpenCV, sin dependencias adicionales ni fondo vacío inicial. Se comprobaron 2 cruces en un tramo del video Farmquip propuesto por el usuario y 6 en Toros7 completo. La suite actual tiene **27 pruebas aprobadas**. Las oclusiones fuertes, los cambios de cámara y la precisión general siguen pendientes de validación.
+
+El modo `pose` detecta bovinos individuales y registra un total de cruces, sin categorías de edad. Todavía puede omitir o confundir animales muy superpuestos. El modo `motion` identifica movimiento y deja los cruces pendientes si falta calibración de altura.
 
 ### Instalación para colaboradores
 
@@ -27,6 +33,8 @@ py -3.15 -m venv .venv
 ```
 
 Cuando cambie `requirements.txt`, vuelve a ejecutar el segundo comando. Puedes comprobar la instalación con `.\.venv\Scripts\python.exe -c "import cv2, mediapipe, numpy; print(cv2.__version__, mediapipe.__version__, numpy.__version__)"`.
+
+Si tu instalación de Windows no tiene el lanzador `py`, usa `uv sync --locked` o ejecuta `python -m venv .venv` después de verificar con `python --version` que estás usando Python 3.15.
 
 ### Instalación opcional con uv
 
@@ -43,3 +51,37 @@ El comando crea un entorno local en `.venv/` con Python 3.15 e instala las versi
 - [Guía para agentes de IA](docs/README.md)
 - [Diseño del conteo y la clasificación](docs/diseno.md)
 - [Protocolo de validación en el corral](docs/validacion.md)
+- [Uso, calibración y controles](docs/uso.md)
+- [Implementación y resultados de pruebas](docs/implementacion.md)
+
+## Ejecutar el prototipo
+
+Desde la raíz del repositorio, después de instalar el entorno:
+
+Para contar bovinos con detección individual, descarga los modelos una vez y coloca tu video en `assets\corral.mp4`:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.download_pose_models
+.\.venv\Scripts\python.exe -m conteo_bovino --detector pose --source assets\corral.mp4 --config config\example.json
+```
+
+El modo de pose suma un bovino cuando cruza A y B. Ajusta las líneas y la dirección al encuadre de tu video. La [guía de pose](docs/pose-animal.md) incluye el ejemplo de Farmquip y los comandos para exportar el video anotado. Los modelos, los videos y el entorno se guardan localmente.
+
+Para usar el modo de movimiento:
+
+```powershell
+# Video grabado; sustituye la ruta por una toma del corral.
+.\.venv\Scripts\python.exe -m conteo_bovino --source "assets\corral.mp4" --config config\example.json
+
+# Cámara en vivo, manteniendo la manga vacía durante la preparación del fondo.
+.\.venv\Scripts\python.exe -m conteo_bovino --source 0
+```
+
+Para probarlo sin cámara ni video del rancho:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_demo.py
+.\.venv\Scripts\python.exe -m conteo_bovino --source assets\demo_sintetico.avi --output-video
+```
+
+La demostración contiene dos cruces completos, una pausa y un intento con retroceso. En modo de movimiento sin calibración se esperan **2 pendientes**. Consulta [la guía de uso](docs/uso.md) para ajustar el encuadre, las líneas y el sentido de avance.

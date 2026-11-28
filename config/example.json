@@ -1,0 +1,19 @@
+{
+  "roi": [0.05, 0.1, 0.9, 0.8],
+  "line_a": 0.35,
+  "line_b": 0.65,
+  "direction": "right",
+  "warmup_frames": 30,
+  "min_area_ratio": 0.005,
+  "max_area_ratio": 0.65,
+  "max_distance_ratio": 0.15,
+  "max_missing_seconds": 2.0,
+  "min_height_samples": 3,
+  "ground_y": null,
+  "reference_top_y": null,
+  "reference_height_cm": null,
+  "adult_threshold_cm": null,
+  "uncertainty_cm": 10.0,
+  "gesture_hold_seconds": 0.7,
+  "gesture_release_seconds": 0.4
+}
